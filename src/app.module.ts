@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
     UserModule,
     AuthModule,
     MongooseModule.forRoot(process.env.MONGO_URI),
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [
