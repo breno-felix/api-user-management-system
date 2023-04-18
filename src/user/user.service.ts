@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -17,19 +17,11 @@ export class UserService {
   }
 
   async findOne(userId: string): Promise<UserDocument> {
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return user;
+    return this.userModel.findById(userId);
   }
 
   async findByEmail(email: string): Promise<UserDocument> {
-    const user = await this.userModel.findOne({ email });
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return user;
+    return this.userModel.findOne({ email });
   }
 
   async findAll(): Promise<UserDocument[]> {
@@ -40,18 +32,10 @@ export class UserService {
     userId: string,
     updateUserDto: UpdateUserDTO,
   ): Promise<UserDocument> {
-    const user = await this.userModel.findByIdAndUpdate(userId, updateUserDto);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return user;
+    return this.userModel.findByIdAndUpdate(userId, updateUserDto);
   }
 
   async delete(userId: string): Promise<UserDocument> {
-    const user = await this.userModel.findByIdAndDelete(userId);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return user;
+    return this.userModel.findByIdAndDelete(userId);
   }
 }
