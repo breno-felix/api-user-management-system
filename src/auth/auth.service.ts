@@ -1,8 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { sign } from 'jsonwebtoken';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserDocument } from 'src/user/schemas/user.schema';
+
+interface Token {
+  accessToken: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -11,15 +19,42 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<string> {
+  async login(email: string, password: string): Promise<Token> {
     const user = await this.userService.findByEmail(email);
-    if (await bcrypt.compare(password, user.password)) {
+    if (!user) {
       throw new UnauthorizedException();
     }
-    return this.createAccessToken(user._id.toString());
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException();
+    }
+    return this.createAccessToken(user);
   }
 
-  async createAccessToken(userId: string): Promise<string> {
-    return this.jwtService.signAsync(userId);
+  async createAccessToken(user: UserDocument): Promise<Token> {
+    return {
+      accessToken: await this.jwtService.signAsync({
+        id: user._id,
+        name: user.name,
+        role: user.role,
+      }),
+    };
+  }
+
+  async checkToken(token: string) {
+    try {
+      const data = await this.jwtService.verifyAsync(token);
+      return data;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async isValidToken(token: string): Promise<boolean> {
+    try {
+      await this.checkToken(token);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
