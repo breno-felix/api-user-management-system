@@ -20,14 +20,10 @@ export class AuthService {
   ) {}
 
   async login(email: string, password: string): Promise<Token> {
-    const user = await this.userService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException();
+    const user = await this.checkEmail(email);
+    if (await this.checkPassword(password, user.password)) {
+      return this.createAccessToken(user);
     }
-    if (!(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException();
-    }
-    return this.createAccessToken(user);
   }
 
   async createAccessToken(user: UserDocument): Promise<Token> {
@@ -56,5 +52,23 @@ export class AuthService {
     } catch (error) {
       return false;
     }
+  }
+
+  private async checkEmail(email: string): Promise<UserDocument> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  private async checkPassword(
+    passwordSent: string,
+    passwordStored: string,
+  ): Promise<boolean> {
+    if (!(await bcrypt.compare(passwordSent, passwordStored))) {
+      throw new UnauthorizedException();
+    }
+    return true;
   }
 }
