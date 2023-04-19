@@ -28,8 +28,13 @@ export class AuthGuard implements CanActivate {
       if (!session) {
         throw new UnauthorizedException();
       }
+      const user = await this.userService.findOne(data.id);
+      if (!user) {
+        throw new UnauthorizedException();
+      }
       request.tokenPayload = data;
-      request.user = await this.userService.findOne(data.id);
+      request.user = user;
+      request.session = session;
       return true;
     } catch (error) {
       if (error instanceof UnauthorizedException) {
