@@ -8,10 +8,10 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
-import { UserDecorator } from 'src/decorators/user.decorator';
 import { LoginUserDTO } from './dto/login-user.dto';
-import { UserDocument } from 'src/user/schemas/user.schema';
 import { SessionService } from 'src/session/session.service';
+import { SessionDecorator } from 'src/decorators/session.decorator';
+import { SessionDocument } from 'src/session/schemas/session.schema';
 
 interface Token {
   accessToken: string;
@@ -33,8 +33,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   @Post('/logout')
-  async logout(@UserDecorator() user: UserDocument) {
-    const userId = user._id.toString();
-    await this.sessionService.deleteSessionByUserId(userId);
+  async logout(@SessionDecorator() session: SessionDocument) {
+    const sessionId = session._id.toString();
+    await this.sessionService.delete(sessionId);
   }
 }
