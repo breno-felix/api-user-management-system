@@ -27,4 +27,8 @@ export class SessionService {
   async deleteSessionByUserId(userId: string): Promise<void> {
     await this.sessionModel.deleteOne({ userId });
   }
+
+  async delete(sessionId: string): Promise<void> {
+    await this.sessionModel.findByIdAndDelete(sessionId);
+  }
 }
