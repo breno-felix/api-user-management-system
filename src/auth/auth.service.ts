@@ -23,16 +23,20 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<Token> {
     const user = await this.checkEmail(email);
+    const userId = user._id.toString();
     if (await this.checkPassword(password, user.password)) {
       const currentSession = await this.sessionService.findLastSessionByUserId(
-        user._id.toString(),
+        userId,
       );
-      if (currentSession && this.isValidToken(currentSession.token)) {
+      if (currentSession && (await this.isValidToken(currentSession.token))) {
         return { accessToken: currentSession.token };
+      }
+      if (currentSession) {
+        await this.sessionService.deleteSessionByUserId(userId);
       }
       const newToken = await this.createAccessToken(user);
       await this.sessionService.create({
-        userId: user._id.toString(),
+        userId,
         token: newToken.accessToken,
       });
       return newToken;
@@ -54,7 +58,7 @@ export class AuthService {
       const data = await this.jwtService.verifyAsync(token);
       return data;
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException({ cause: error });
     }
   }
 
