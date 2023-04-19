@@ -23,13 +23,13 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<Token> {
     const user = await this.checkEmail(email);
-    const currentSession = await this.sessionService.findLastSessionByUserId(
-      user._id.toString(),
-    );
-    if (currentSession && this.isValidToken(currentSession.token)) {
-      return { accessToken: currentSession.token };
-    }
     if (await this.checkPassword(password, user.password)) {
+      const currentSession = await this.sessionService.findLastSessionByUserId(
+        user._id.toString(),
+      );
+      if (currentSession && this.isValidToken(currentSession.token)) {
+        return { accessToken: currentSession.token };
+      }
       const newToken = await this.createAccessToken(user);
       await this.sessionService.create({
         userId: user._id.toString(),
