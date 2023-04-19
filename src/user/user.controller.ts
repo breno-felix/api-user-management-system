@@ -16,11 +16,15 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from './enum/Roles';
 import { RoleGuard } from 'src/guards/role.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { SessionService } from 'src/session/session.service';
 @Roles(Role.SUPER_ADMIN)
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly sessionService: SessionService,
+  ) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDTO): Promise<UserDocument> {
@@ -51,7 +55,8 @@ export class UserController {
   }
 
   @Delete(':userId')
-  async delete(@Param('userId') userId: string): Promise<UserDocument> {
-    return this.userService.delete(userId);
+  async delete(@Param('userId') userId: string): Promise<void> {
+    await this.userService.delete(userId);
+    await this.sessionService.deleteSessionByUserId(userId);
   }
 }
