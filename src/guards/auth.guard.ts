@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from 'src/auth/auth.service';
+import { SessionService } from 'src/session/session.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly sessionService: SessionService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -22,10 +24,17 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const data = await this.authService.checkToken(token);
+      const session = await this.sessionService.findByToken(token);
+      if (!session) {
+        throw new UnauthorizedException();
+      }
       request.tokenPayload = data;
       request.user = await this.userService.findOne(data.id);
       return true;
     } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
       return false;
     }
   }

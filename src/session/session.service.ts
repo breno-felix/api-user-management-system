@@ -19,4 +19,12 @@ export class SessionService {
   async findLastSessionByUserId(userId: string): Promise<SessionDocument> {
     return this.sessionModel.findOne({ userId }).sort({ created_at: -1 });
   }
+
+  async findByToken(token: string): Promise<SessionDocument> {
+    return this.sessionModel.findOne({ token });
+  }
+
+  async deleteSessionByUserId(userId: string): Promise<void> {
+    await this.sessionModel.deleteOne({ userId });
+  }
 }
