@@ -2,21 +2,21 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Delete,
   Body,
   Param,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto';
 import { UserDocument } from './schemas/user.schema';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from './enum/Roles';
 import { RoleGuard } from 'src/guards/role.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { SessionService } from 'src/session/session.service';
+import { UpdateRoleUserDTO } from './dto/update-role-user.dto';
 @Roles(Role.SUPER_ADMIN)
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('users')
@@ -46,12 +46,12 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Put(':userId')
-  async update(
+  @Patch(':userId')
+  async updateRole(
     @Param('userId') userId: string,
-    @Body() updateUserDto: UpdateUserDTO,
-  ): Promise<UserDocument> {
-    return this.userService.update(userId, updateUserDto);
+    @Body() updateRoleUserDto: UpdateRoleUserDTO,
+  ): Promise<void> {
+    await this.userService.updateRole(userId, updateRoleUserDto);
   }
 
   @Delete(':userId')
