@@ -20,6 +20,10 @@ export class SessionService {
     return this.sessionModel.findOne({ userId }).sort({ created_at: -1 });
   }
 
+  async findAll(): Promise<SessionDocument[]> {
+    return this.sessionModel.find();
+  }
+
   async findByToken(token: string): Promise<SessionDocument> {
     return this.sessionModel.findOne({ token });
   }
