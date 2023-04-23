@@ -12,7 +12,7 @@ import { SessionModule } from './session/session.module';
   imports: [
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 10,
+      limit: 200,
     }),
     UserModule,
     AuthModule,
