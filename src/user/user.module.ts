@@ -12,6 +12,7 @@ import { SessionModule } from 'src/session/session.module';
 import { User, UserSchema } from './schemas/user.schema';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { UsersGateway } from './user.gateway';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { UserService } from './user.service';
     SessionModule,
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UsersGateway],
   exports: [UserService],
 })
 export class UserModule implements NestModule {
