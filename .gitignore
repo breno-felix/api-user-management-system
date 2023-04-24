@@ -1,5 +1,6 @@
 # environment variables
 .env 
+.env.production
 
 # compiled output
 /dist
