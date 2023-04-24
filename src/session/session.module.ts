@@ -5,6 +5,7 @@ import { SessionService } from './session.service';
 import { SessionController } from './session.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
+import { SessionsGateway } from './session.gateway';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { UserModule } from 'src/user/user.module';
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
   ],
-  providers: [SessionService],
+  providers: [SessionService, SessionsGateway],
   exports: [SessionService],
   controllers: [SessionController],
 })
